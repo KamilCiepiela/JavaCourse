@@ -3,6 +3,8 @@ package bottle;
 public class Bottle {
     private double capacity;
 
+    Bottle(){}
+
     Bottle(double capacity)
     {
         this.capacity = capacity;
@@ -12,9 +14,15 @@ public class Bottle {
     {
         return capacity;
     }
-    void pourIn(double amount)
+
+    boolean pourIn(double amount)
     {
-        this.capacity += amount;
+        if (amount >= capacity)
+            this.capacity += amount;
+        else
+            return false;
+
+        return true;
     }
     boolean pourOut(double amount)
     {
@@ -34,26 +42,33 @@ public class Bottle {
         }
         else
             System.out.println("Too little to transfer");
+
+        if (whereToTransfer.getCapacity() <= capacity){
+            whereToTransfer.pourIn(amount);
+        }
+        else
+            System.out.println("Too much to transfer. The " + amount + "l has been transfered.");
     }
 
     public static void main(String[] args) {
-        Bottle[] bottle = new Bottle[50]; //NULL
+        Bottle[] bottle = new Bottle[3]; //NULL
 
-        for (int i = 0; i < 50; i++){
-            double a = 0.5;
-
-            System.out.println(bottle[i]);
+        for (int i = 0; i < bottle.length; i++){
+            double a = 3;
+            double b = i+a;
+            bottle[i] = new Bottle(b);
+//            System.out.println(bottle[i]);
         }
-//        butelka[0] = new Butelka(5);
-//        butelka[1] = new Butelka(8);
-//        butelka[2] = new Butelka(10);
+//        bottle[0] = new Bottle(5);
+//        bottle[1] = new Bottle(8);
+//        bottle[2] = new Bottle(10);
 
-        bottle[0].pourIn(4);
+//        bottle[0].pourIn(4);
 
-        bottle[0].transfer(25, bottle[1]);
+//        bottle[1].transfer(1, bottle[2]);
 
-        for (int i = 0; i < 50; i++) {
-            System.out.println(bottle[0].getCapacity());
+        for (int i = 0; i < bottle.length; i++) {
+            System.out.println(bottle[i].getCapacity());
         }
 
     }
