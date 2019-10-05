@@ -1,4 +1,4 @@
-package klasyzewnetrzne;
+package klasywewnetrzne;
 
 public class Main
 {
