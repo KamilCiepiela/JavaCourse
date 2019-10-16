@@ -6,20 +6,15 @@ public class Main extends JFrame
 {
     public Main()
     {
-        super("Zdarzenia");
-        this.setBounds(300,300,300,200);
-
         initComponents();
-
-        this.setDefaultCloseOperation(3);
-
     }
 
     public void initComponents()
     {
+        this.setTitle("Własne menu");
+        this.setBounds(300,300,300,200);
 
-
-
+        this.setDefaultCloseOperation(3);
     }
 
     public static void main(String[] args)
@@ -27,7 +22,4 @@ public class Main extends JFrame
         new Main().setVisible(true);
 
     }
-
-
-
 }
