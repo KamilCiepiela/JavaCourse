@@ -1,6 +1,7 @@
 package ramkalistykombinowane;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -19,8 +20,16 @@ public class Main extends JFrame
         kombinacja.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println(((JComboBox) e.getSource()).getSelectedItem());
+//                System.out.println(((JComboBox) e.getSource()).getSelectedItem());
 //                        kombinacja.getSelectedItem();  // tak też można się dostać do wywoływanego elementu
+                // pierwsza metoda
+                ColorHandler handler = (ColorHandler)(((JComboBox) e.getSource()).getSelectedItem());
+                ((JComboBox)e.getSource()).setBackground(handler.getColor());
+
+                // druga metoda
+                ((JComboBox)e.getSource()).setBackground(((ColorHandler)(((JComboBox) e.getSource()).getSelectedItem())).getColor());
+
+
             }
         });
         panel.add(kombinacja);
@@ -28,7 +37,11 @@ public class Main extends JFrame
 //        kombinacja.addItem("Czarny");
 //        kombinacja.addItem(new String("Czarny"));
 //        kombinacja.addItem(new String("Zielony"));
-        kombinacja.addItem(new ColorHandler());
+        kombinacja.addItem(new ColorHandler("Czarny", Color.BLACK));
+        kombinacja.addItem(new ColorHandler("Zielony", Color.GREEN));
+        kombinacja.addItem(new ColorHandler("Niebieski", Color.BLUE));
+        kombinacja.addItem(new ColorHandler("Żółty", Color.YELLOW));
+
 
 
 
@@ -37,7 +50,23 @@ public class Main extends JFrame
     }
 
     private class ColorHandler{
+        public ColorHandler(String colorName, Color kolor)
+        {
+            this.kolor = kolor;
+            this.colorName = colorName;
+        }
 
+        @Override
+        public String toString(){
+            return this.colorName;
+        }
+
+        public Color getColor() {
+            return this.kolor;
+        }
+
+        private Color kolor;
+        private String colorName;
     }
 
     private JPanel panel = new JPanel();
