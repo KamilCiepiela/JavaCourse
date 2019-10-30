@@ -1,4 +1,4 @@
-package ramkacentrowania;
+package ramkacentrowanie;
 
 import javax.swing.*;
 import java.awt.*;
