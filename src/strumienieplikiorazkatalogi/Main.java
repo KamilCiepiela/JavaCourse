@@ -1,4 +1,4 @@
-package plikiorazkatalogi;
+package strumienieplikiorazkatalogi;
 
 import java.io.File;
 import java.io.IOException;
