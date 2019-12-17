@@ -1,6 +1,8 @@
 package strumienieserializacjaobiektow;
 
 import java.io.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 
 public class Main
@@ -18,7 +20,7 @@ public class Main
 
         try
         {
-            ObjectOutputStream outS = new ObjectOutputStream(new FileOutputStream("nowy3.txt"));
+            ObjectOutputStream outS = new ObjectOutputStream(new GZIPOutputStream(new FileOutputStream("nowy3.txt")));
             // klasa ObjectOutputStream pozwala nam serializować dane - podczas zapisu do pliku, danym zostaje nadany numer seryjny, do którego będziemy się odwoływać
             // klasa będzie sprawdzać za każdym razem, czy taki nr seryjny już istnieje, a jak nie to go nada
             // te dane nie są szyfrowane, dlatego trzeba sprawdzać, czy nie zostały podmienione w trakcie
@@ -28,7 +30,9 @@ public class Main
 
             outS.close();
 
-            ObjectInputStream inS = new ObjectInputStream(new FileInputStream("nowy3.txt"));
+            ObjectInputStream inS = new ObjectInputStream(new GZIPInputStream(new FileInputStream("nowy3.txt")));
+            // GZIP różni się tym od ZIPa, że tylko kompresuje, ale nie tworzy archiwum (katalogu)
+            // jak się coś da na GZIP Output, to input też musi być poprzedzony GZIPem
 
             //wczytywanie pojedynczej danej
 //            Towar a = (Towar)inS.readObject();  //rzutowanie obiektu i przypisanie do zmiennej
