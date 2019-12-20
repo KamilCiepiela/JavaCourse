@@ -1,9 +1,9 @@
 package strumieniefilezipper;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import javax.swing.Icon;
-import java.lang.ClassCastException;
+import java.lang.*;
 
 public class FileZipper extends JFrame
 {
@@ -15,8 +15,8 @@ public class FileZipper extends JFrame
 
         JMenu menuPlik = pasekMenu.add(new JMenu("Plik"));
 
-        Action akcjaDodawania = new Akcja("Dodaj", "Dodaj nowy wpis do archiwum", "ctrl D", new ImageIcon("dodaj.jpg"));
-        Action akcjaUsuwania = new Akcja("Usuń", "Usuń zanzaczony/ zaznaczone wpisy do archiwum", "ctrl U", new ImageIcon("usun.jpg"));
+        Action akcjaDodawania = new Akcja("Dodaj", "Dodaj nowy wpis do archiwum", "ctrl D", new ImageIcon("dodaj.png")); // coś nie działa z ikonami
+        Action akcjaUsuwania = new Akcja("Usuń", "Usuń zanzaczony/ zaznaczone wpisy do archiwum", "ctrl U", new ImageIcon("usun.png"));
         Action akcjaZipowania = new Akcja("Zip", "Zipuj", "ctrl Z");
 
         JMenuItem menuOtwórz = menuPlik.add(akcjaDodawania);
@@ -73,7 +73,7 @@ public class FileZipper extends JFrame
 
         public Akcja(String nazwa, String opis, String klawiaturowySkrót, Icon ikona){
             this(nazwa, opis, klawiaturowySkrót);
-            this.putValue(Action.SMALL_ICON, nazwa);
+            this.putValue(Action.SMALL_ICON, ikona);
         }
 
         @Override
