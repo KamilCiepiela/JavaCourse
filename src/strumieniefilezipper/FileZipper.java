@@ -2,9 +2,11 @@ package strumieniefilezipper;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.io.*;
 import java.lang.*;
 import java.util.ArrayList;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class FileZipper extends JFrame
 {
@@ -112,9 +114,8 @@ public class FileZipper extends JFrame
             else if (e.getActionCommand().equals("Usuń"))
                 usunWpisZListy();
             else if (e.getActionCommand().equals("Zip"))
-                System.out.println("Zipowanie");
+                stwórzArchiwumZip();
         }
-
 
         private void dodajWipsyDoArchiwum()
         {
@@ -142,9 +143,44 @@ public class FileZipper extends JFrame
         }
 
         private void usunWpisZListy() {  //usuwanie zaznaczonych plików i katalogów z listy po dodaniu
-            int[] tmp = lista.getSelectedIndices();
+            int[] tmp = lista.getSelectedIndices(); // tutaj jest odniesienie do starej listy sprzed zazanczenia usunięcia, dlatego niżej trzeba jeszcze odjąć i, żeby to uaktualnić
             for (int i = 0; i < tmp.length; i++)  //  zaznacza po nr indeksów z listy popdanych plików i katalogów
                 modelListy.remove(tmp[i]-i);  // w Array List lista cofa indeks po usunięciu, więc po przejściu iteracji nie usuwało by ostatniego elementu w tablicy
         }  // usuwamy tą metodą tylko nazwy plików z listy, ale nie odświeżamy i usuwamy listy ścieżek do plików w ArrayList
+
+        private void stwórzArchiwumZip() {
+            wybieracz.setCurrentDirectory(new File(System.getProperty("user.dir")));  //katalog poczatkowy
+            wybieracz.setSelectedFile(new File(System.getProperty("user.dir") + File.separator + "mojanazwa.zip"));  //wybierz, co ma być zaznaczone
+            wybieracz.showDialog(rootPane, "Kompresuj");  // ustawienie co ma robić button w oknie zipowania
+
+            String[] tab = new String[] {"build.xml", "manifest.mf", "inny.txt", "obrazek.jpeg"};
+            byte tmpData[] = new byte[BUFFOR]; // wielkośc buforu, w którym będziemy przechowywać tymczasowe dane
+            try {
+                ZipOutputStream zOutS = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream("nazwamojegozipa.zip"), BUFFOR));
+                // dla szybszego wykonywania dajemy BufferedOutputStream, a do otwarcia pliku jest FileInputStream
+
+                for (int i = 0; i < tab.length; i++) {
+//                BufferedInputStream inS = new BufferedInputStream(new FileInputStream("inny.txt"), BUFFOR);  // będzie czytał plik i zapisywał go w buforze
+                    BufferedInputStream inS = new BufferedInputStream(new FileInputStream(tab[i]), BUFFOR);  // będzie czytał tablicę i zapisywał ją w buforze
+
+//                zOutS.putNextEntry(new ZipEntry("inny.txt"));
+                    zOutS.putNextEntry(new ZipEntry(tab[i]));
+                    //wrzucamy plik w kolejkę do zipowania, ale on jest już otwarty poprzednią komendą
+                    // tutaj wykonujemy operacje na pliku, aż do zamknięcia - closeEntry
+
+                    int counter; // licznik, ile bajtów będzie odczytanych
+                    while ((counter = inS.read(tmpData, 0, BUFFOR)) != -1)
+                        zOutS.write(tmpData, 0, counter);  // counter tutaj oznacza, że kolejny plik zostanie dopisany do końca ostatniego, niepełnego pliku, który został wcześniej odczytany
+
+                    zOutS.closeEntry();  //zamykamy wpis
+                    inS.close();  // zamykamy strumień wejściowy pliku
+                }
+                zOutS.close();  //zamykamy strumień całego zipu
+            }
+            catch (IOException e){
+                System.out.println(e.getMessage());
+            }
+        }
+        public static final int BUFFOR = 1024;
     }
 }
