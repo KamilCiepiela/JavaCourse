@@ -67,7 +67,13 @@ public class FileZipper extends JFrame
             return lista.get(index);  //podmieniemy Stringa ze ścieżki z addElement powyżej na obiekt File w tej metodzie
         }
 
-        ArrayList lista = new ArrayList();  //lista do przechowywania całych ścieżek do plików
+        @Override
+        public Object remove(int index) {  // tu usuwamy elementy z listy ścieżek do plików
+            lista.remove(index);  //usuwa elementy z indeksu listy
+            return super.remove(index);  //usuwa wpisy z listy standardowo
+        }
+
+            ArrayList lista = new ArrayList();  //lista do przechowywania całych ścieżek do plików
 
     };
     // możemy sobie rozszerzyć każdą klasę o klasę anonimową!!!!!!!!!!!!!
@@ -104,10 +110,11 @@ public class FileZipper extends JFrame
             if (e.getActionCommand().equals("Dodaj"))
                 dodajWipsyDoArchiwum();
             else if (e.getActionCommand().equals("Usuń"))
-                System.out.println("Usuwanie");
+                usunWpisZListy();
             else if (e.getActionCommand().equals("Zip"))
                 System.out.println("Zipowanie");
         }
+
 
         private void dodajWipsyDoArchiwum()
         {
@@ -133,5 +140,11 @@ public class FileZipper extends JFrame
 
             return false;
         }
+
+        private void usunWpisZListy() {  //usuwanie zaznaczonych plików i katalogów z listy po dodaniu
+            int[] tmp = lista.getSelectedIndices();
+            for (int i = 0; i < tmp.length; i++)  //  zaznacza po nr indeksów z listy popdanych plików i katalogów
+                modelListy.remove(tmp[i]-i);  // w Array List lista cofa indeks po usunięciu, więc po przejściu iteracji nie usuwało by ostatniego elementu w tablicy
+        }  // usuwamy tą metodą tylko nazwy plików z listy, ale nie odświeżamy i usuwamy listy ścieżek do plików w ArrayList
     }
 }
