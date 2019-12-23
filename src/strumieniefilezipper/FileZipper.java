@@ -143,44 +143,81 @@ public class FileZipper extends JFrame
         }
 
         private void usunWpisZListy() {  //usuwanie zaznaczonych plików i katalogów z listy po dodaniu
-            int[] tmp = lista.getSelectedIndices(); // tutaj jest odniesienie do starej listy sprzed zazanczenia usunięcia, dlatego niżej trzeba jeszcze odjąć i, żeby to uaktualnić
+            int[] tmp = lista.getSelectedIndices(); // tutaj jest odniesienie do starej listy sprzed zazanczenia usunięcia, dlatego niżej trzeba jeszcze odjąć i, żeby uaktualnić tą listę
             for (int i = 0; i < tmp.length; i++)  //  zaznacza po nr indeksów z listy popdanych plików i katalogów
                 modelListy.remove(tmp[i]-i);  // w Array List lista cofa indeks po usunięciu, więc po przejściu iteracji nie usuwało by ostatniego elementu w tablicy
         }  // usuwamy tą metodą tylko nazwy plików z listy, ale nie odświeżamy i usuwamy listy ścieżek do plików w ArrayList
 
         private void stwórzArchiwumZip() {
             wybieracz.setCurrentDirectory(new File(System.getProperty("user.dir")));  //katalog poczatkowy
-            wybieracz.setSelectedFile(new File(System.getProperty("user.dir") + File.separator + "mojanazwa.zip"));  //wybierz, co ma być zaznaczone
-            wybieracz.showDialog(rootPane, "Kompresuj");  // ustawienie co ma robić button w oknie zipowania
+            wybieracz.setSelectedFile(new File(System.getProperty("user.dir") + File.separator + "mojanazwazipa.zip"));  //wybierz, co ma być zaznaczone
+            int tmp = wybieracz.showDialog(rootPane, "Kompresuj");  // ustawienie co ma robić button w oknie zipowania
 
-            String[] tab = new String[] {"build.xml", "manifest.mf", "inny.txt", "obrazek.jpeg"};
-            byte tmpData[] = new byte[BUFFOR]; // wielkośc buforu, w którym będziemy przechowywać tymczasowe dane
-            try {
-                ZipOutputStream zOutS = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream("nazwamojegozipa.zip"), BUFFOR));
-                // dla szybszego wykonywania dajemy BufferedOutputStream, a do otwarcia pliku jest FileInputStream
+            if (tmp == JFileChooser.APPROVE_OPTION) {
+                byte tmpData[] = new byte[BUFFOR]; // wielkośc buforu, w którym będziemy przechowywać tymczasowe dane
+                try {
+                    ZipOutputStream zOutS = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(wybieracz.getSelectedFile()), BUFFOR));  //wybieramy
+                    // dla szybszego wykonywania dajemy BufferedOutputStream, a do otwarcia pliku jest FileInputStream
 
-                for (int i = 0; i < tab.length; i++) {
-//                BufferedInputStream inS = new BufferedInputStream(new FileInputStream("inny.txt"), BUFFOR);  // będzie czytał plik i zapisywał go w buforze
-                    BufferedInputStream inS = new BufferedInputStream(new FileInputStream(tab[i]), BUFFOR);  // będzie czytał tablicę i zapisywał ją w buforze
+                    for (int i = 0; i < modelListy.getSize(); i++) { //będziemy się poruszać po całym modelu listy zaznaczonych elementów
+                        if (!((File)modelListy.get(i)).isDirectory())
+                            zipuj(zOutS, (File)modelListy.get(i), tmpData, (((File) modelListy.get(i)).getPath())); //sciezkaBazowa to aktualne przejście przez naszą listę
+                        else
+                        {
+                            wypiszSciezki((File)modelListy.get(i));  //jeśli katalog, to najpierw wypiszemy ścieżki katalogów/podkatalogów, a potem doda pliki z katalogu głównego do ścieżek
 
-//                zOutS.putNextEntry(new ZipEntry("inny.txt"));
-                    zOutS.putNextEntry(new ZipEntry(tab[i]));
-                    //wrzucamy plik w kolejkę do zipowania, ale on jest już otwarty poprzednią komendą
-                    // tutaj wykonujemy operacje na pliku, aż do zamknięcia - closeEntry
+                            for (int j = 0; j < listaSciezek.size(); j++)
+                                zipuj(zOutS, (File)listaSciezek.get(j), tmpData, (((File) modelListy.get(i)).getPath()));
 
-                    int counter; // licznik, ile bajtów będzie odczytanych
-                    while ((counter = inS.read(tmpData, 0, BUFFOR)) != -1)
-                        zOutS.write(tmpData, 0, counter);  // counter tutaj oznacza, że kolejny plik zostanie dopisany do końca ostatniego, niepełnego pliku, który został wcześniej odczytany
-
-                    zOutS.closeEntry();  //zamykamy wpis
-                    inS.close();  // zamykamy strumień wejściowy pliku
+                            listaSciezek.removeAll(listaSciezek);  // trzeba wyzerować po każdej iteracji, bo inaczej pliki będą się pojawiać jako duplikaty
+                        }
+                    }
+                    zOutS.close();  //zamykamy strumień całego zipu
+                } catch (IOException e) {
+                    System.out.println(e.getMessage());
                 }
-                zOutS.close();  //zamykamy strumień całego zipu
-            }
-            catch (IOException e){
-                System.out.println(e.getMessage());
             }
         }
+
+        private void zipuj(ZipOutputStream zOutS, File sciezkaPliku, byte[] tmpData, String sciezkaBazowa) throws IOException {  //ten wyjątek się pojawia, bo mamy tu zamykanie, ale zostanie on obsłużony powyżej
+//            BufferedInputStream inS = new BufferedInputStream(new FileInputStream(((File)modelListy.get(i)).getPath()), BUFFOR);  // będzie czytał tablicę i zapisywał ją w buforze
+
+            BufferedInputStream inS = new BufferedInputStream(new FileInputStream(sciezkaPliku), BUFFOR);  // będzie czytał tablicę i zapisywał ją w buforze
+
+//            zOutS.putNextEntry(new ZipEntry("Katalog" + File.separator + ((File)modelListy.get(i)).getName()));
+            //wrzucamy plik w kolejkę do zipowania, ale on jest już otwarty poprzednią komendą
+            // tutaj wykonujemy operacje na pliku, aż do zamknięcia - closeEntry
+//            zOutS.putNextEntry(new ZipEntry(sciezkaPliku.getName()));  // bierze wszystkie pliki ze wszystkich katalogów i kopiuje do zipa, ale już bez podziału na katalogi
+
+            zOutS.putNextEntry(new ZipEntry(sciezkaPliku.getPath().substring(sciezkaBazowa.lastIndexOf(File.separator) + 1))) ;
+            // aby tego uniknąć, stosujemy metodę substring, która tnie string (tu ścieżki); tu będziemy ciąć od ostatniego wystąpienia backslasha
+
+
+            int counter; // licznik, ile bajtów będzie odczytanych
+            while ((counter = inS.read(tmpData, 0, BUFFOR)) != -1)
+                zOutS.write(tmpData, 0, counter);  // counter tutaj oznacza, że kolejny plik zostanie dopisany do końca ostatniego, niepełnego pliku, który został wcześniej odczytany
+
+            zOutS.closeEntry();  //zamykamy wpis
+            inS.close();  // zamykamy strumień wejściowy pliku
+        }
+
         public static final int BUFFOR = 1024;
+
+        private void wypiszSciezki(File nazwaSciezki) {
+            String[] nazwyPlikowIKatalogow = nazwaSciezki.list();
+            System.out.println(nazwaSciezki.getPath());
+
+            for (int i = 0; i < nazwyPlikowIKatalogow.length; i++) {
+                File p = new File(nazwaSciezki.getPath(), nazwyPlikowIKatalogow[i]);
+
+            if (p.isFile())  // dzięki temu znaleźliśmy tylko pliki, również w podktalogach, ale bez wtpisywania katalogów
+                listaSciezek.add(p);  // jeśli to jest katalog, to dodaj go do listy ścieżek; dodaje ścieki we wszystkich subkategoriach od miejsce "wypisz ścieżki"
+
+            if (p.isDirectory())
+                wypiszSciezki(new File(p.getPath()));  // wywołujemy metodę w metodzie - jeśli natrafi na folder to wypisze wszystkie pliki wewnątrz folderu
+            }
+        }
+
+        ArrayList listaSciezek = new ArrayList();  // lista do trzymania ścieżek
     }
 }
