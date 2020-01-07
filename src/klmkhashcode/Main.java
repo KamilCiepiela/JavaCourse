@@ -4,7 +4,7 @@ package klmkhashcode;
 
 class Element
 {
-    public Element (int wartosc)
+    public Element (int wartosc)  //konstruktor publiczny
     {
         this.wartosc = wartosc;
     }
@@ -12,7 +12,7 @@ class Element
     @Override
     public boolean equals(Object obj)  // taką metodę powinniśmy ZAWSZE nadpisywać, jeśli jej elementy będą używane później w innym celu niż default
     {
-//        if (obj == null) return false;  // zabezpieczamu się przed wpisaniem NULL
+//        if (obj == null) return false;  // zabezpieczamy się przed wpisaniem NULL
 
         if (obj == null || this.getClass() != obj.getClass()) return false;  // rónież jeśli klasa obiektu przysłanego jest różna niż klasa Element, to FALSE
 
@@ -36,8 +36,9 @@ public class Main
     {
         Element a = new Element(5);  // ta sama wartość, ale różne adresy w pamięci
         Element b = new Element(5);  // ta sama wartość, ale różne adresy w pamięci
+//        Element b = a;  // TRUE, bo adresy są równe
 
-        System.out.println(a==b);  // FLASE, bo sprawdza adresy, nie wartości; jesli Element b = a, to byłoby TRUE
+        System.out.println(a==b);  // FLASE, bo sprawdza ADRESY, nie WARTOŚCI; jesli Element b = a, to byłoby TRUE
 
 //        System.out.println(a.equals(b));  // również FLASE, bo sprawdza adresy w taki sam sposób jak poprzednio, nie wartości
 
